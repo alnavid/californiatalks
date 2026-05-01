@@ -1,0 +1,15 @@
+services:
+  - type: static
+    name: californiatalks
+    plan: free
+    buildCommand: ""
+    publishPath: public
+    pullRequestPreviewsEnabled: false
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: public, max-age=300
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
