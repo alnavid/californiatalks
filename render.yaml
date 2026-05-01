@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: californiatalks
+    name: californiatalks-static
     runtime: static
     buildCommand: ""
     staticPublishPath: public
