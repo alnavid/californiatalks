@@ -1,9 +1,10 @@
 services:
-  - type: static
+  - type: web
     name: californiatalks
+    runtime: static
     plan: free
     buildCommand: ""
-    publishPath: public
+    staticPublishPath: public
     pullRequestPreviewsEnabled: false
     headers:
       - path: /*
