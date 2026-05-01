@@ -2,7 +2,6 @@ services:
   - type: web
     name: californiatalks
     runtime: static
-    plan: free
     buildCommand: ""
     staticPublishPath: public
     pullRequestPreviewsEnabled: false
