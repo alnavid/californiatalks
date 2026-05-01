@@ -5,7 +5,3 @@ services:
     buildCommand: ""
     staticPublishPath: public
     pullRequestPreviewsEnabled: false
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: public, max-age=300
