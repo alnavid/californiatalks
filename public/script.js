@@ -33,14 +33,14 @@ const counters = document.querySelectorAll("[data-count]");
 
 const animateCounter = (node) => {
   const target = Number(node.dataset.count);
-  const suffix = target === 8 || target === 100 ? "+" : target === 40 ? "M" : "";
+  const suffix = node.dataset.suffix || "";
   const start = performance.now();
   const duration = 900;
 
   const tick = (now) => {
     const progress = Math.min((now - start) / duration, 1);
     const eased = 1 - Math.pow(1 - progress, 3);
-    node.textContent = `${Math.round(target * eased)}${suffix}`;
+    node.textContent = `${Math.round(target * eased).toLocaleString()}${suffix}`;
     if (progress < 1) requestAnimationFrame(tick);
   };
 
