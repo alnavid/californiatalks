@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SMS Consent &amp; Opt-In | California Talks</title>
+    <meta
+      name="description"
+      content="Opt in to receive text-message survey invitations from California Talks. Standard message and data rates may apply. Reply STOP to opt out."
+    />
+    <link rel="icon" href="/favicon.ico?v=20260514a" sizes="any" />
+    <link rel="icon" href="/assets/catalks_bear_favicon.png?v=20260514a" type="image/png" />
+    <link rel="stylesheet" href="/styles.css?v=20260514a" />
+    <style>
+      .legal-hero {
+        padding: clamp(48px, 7vw, 96px) clamp(20px, 6vw, 72px) clamp(28px, 4vw, 56px);
+        background: var(--blue-deep);
+        color: var(--white);
+      }
+      .legal-hero p.eyebrow {
+        color: var(--gold);
+      }
+      .legal-hero h1 {
+        margin: 10px 0 18px;
+        font-size: clamp(2.2rem, 5vw, 4.4rem);
+        font-weight: 900;
+        line-height: 1.04;
+        max-width: 820px;
+      }
+      .legal-hero p.lede {
+        max-width: 720px;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.84);
+        font-size: clamp(1.02rem, 1.5vw, 1.18rem);
+      }
+      .legal-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+        gap: clamp(28px, 6vw, 72px);
+        align-items: start;
+      }
+      .legal-grid h2 {
+        margin: 0 0 14px;
+        font-size: clamp(1.4rem, 2.6vw, 2.1rem);
+        font-weight: 900;
+        line-height: 1.1;
+      }
+      .legal-grid h3 {
+        margin: 22px 0 8px;
+        font-size: 1.02rem;
+        font-weight: 900;
+        letter-spacing: 0.02em;
+      }
+      .legal-grid p,
+      .legal-grid li {
+        color: var(--ink);
+        font-size: 1rem;
+      }
+      .legal-grid ul {
+        padding-left: 20px;
+        margin: 8px 0 0;
+      }
+      .legal-grid li {
+        margin-bottom: 6px;
+      }
+      .legal-grid .disclosure {
+        margin-top: 18px;
+        padding: 16px 18px;
+        background: rgba(22, 75, 115, 0.06);
+        border-left: 3px solid var(--blue);
+        border-radius: 4px;
+        color: var(--blue-deep);
+        font-size: 0.94rem;
+      }
+      .consent-form {
+        display: grid;
+        gap: 14px;
+        padding: clamp(22px, 4vw, 32px);
+        background: var(--white);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+      }
+      .consent-form label {
+        display: grid;
+        gap: 6px;
+        color: var(--blue-deep);
+        font-weight: 850;
+        font-size: 0.96rem;
+      }
+      .consent-form input[type="text"],
+      .consent-form input[type="tel"],
+      .consent-form input[type="email"] {
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 11px 12px;
+        color: var(--ink);
+        font: inherit;
+        background: #fffdf8;
+      }
+      .consent-form input:focus {
+        outline: 3px solid rgba(240, 194, 58, 0.36);
+        border-color: var(--gold);
+      }
+      .consent-form .consent-check {
+        display: grid;
+        grid-template-columns: 22px 1fr;
+        gap: 10px;
+        align-items: start;
+        margin-top: 4px;
+        padding: 12px 14px;
+        background: rgba(240, 194, 58, 0.12);
+        border: 1px solid rgba(240, 194, 58, 0.45);
+        border-radius: 6px;
+        font-weight: 600;
+        color: var(--blue-deep);
+      }
+      .consent-form .consent-check input {
+        margin-top: 4px;
+      }
+      .consent-form .fine-print {
+        margin: 0;
+        color: var(--muted);
+        font-size: 0.86rem;
+      }
+      .consent-form button {
+        min-height: 48px;
+        border: 0;
+        border-radius: 6px;
+        background: var(--blue);
+        color: var(--white);
+        font-weight: 900;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 180ms ease, background 180ms ease;
+      }
+      .consent-form button:hover {
+        transform: translateY(-1px);
+        background: var(--blue-deep);
+      }
+      .consent-form .form-status {
+        min-height: 22px;
+        margin: 0;
+        color: var(--green);
+        font-weight: 800;
+      }
+      .consent-form .form-status.error {
+        color: var(--red);
+      }
+      .sample-msg {
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: #eef2f6;
+        border-radius: 8px;
+        color: var(--ink);
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 0.96rem;
+        line-height: 1.45;
+      }
+      .sample-msg span {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--muted);
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      @media (max-width: 900px) {
+        .legal-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="California Talks home">
+        <img src="/assets/catalks_bear_logo.png?v=20260514a" alt="" />
+        <span>California Talks</span>
+      </a>
+      <nav class="main-nav" aria-label="Primary navigation">
+        <a href="/#services">Services</a>
+        <a href="/#explorer">District Explorer</a>
+        <a href="/#proof">Proof</a>
+        <a href="/#contact">Contact</a>
+      </nav>
+      <a class="nav-cta" href="/#contact">Start a Project</a>
+    </header>
+
+    <main>
+      <section class="legal-hero">
+        <p class="eyebrow">SMS Consent &amp; Opt-In</p>
+        <h1>Receive California Talks survey invitations by text message.</h1>
+        <p class="lede">
+          California Talks runs short, anonymous public-opinion surveys for campaigns, government agencies,
+          and ballot measure teams. If you would like to participate, you can opt in below to receive
+          survey invitations by SMS from our toll-free number.
+        </p>
+      </section>
+
+      <section class="section">
+        <div class="legal-grid">
+          <div>
+            <h2>What you are agreeing to</h2>
+            <p>
+              By submitting the form on this page and checking the consent box, you give California Talks
+              your express written consent to send you SMS text messages inviting you to take part in
+              opinion-research surveys.
+            </p>
+
+            <h3>Program description</h3>
+            <ul>
+              <li>Sender: California Talks (catalks.org)</li>
+              <li>Message type: Survey invitations and, when needed, one short reminder per survey</li>
+              <li>Message frequency: Variable, typically 0 to 2 messages per month</li>
+              <li>Message and data rates may apply (charged by your mobile carrier)</li>
+              <li>Carriers are not liable for delayed or undelivered messages</li>
+            </ul>
+
+            <h3>How to opt out</h3>
+            <p>
+              You can cancel the SMS service at any time. Reply <strong>STOP</strong> to any message we send
+              you and you will be unsubscribed. After you send <strong>STOP</strong>, we will send you one
+              confirmation message and will not send any further texts unless you opt in again.
+            </p>
+
+            <h3>How to get help</h3>
+            <p>
+              For help, reply <strong>HELP</strong> to any message we send, or email
+              <a href="mailto:ali@catalks.org">ali@catalks.org</a>. We will respond with a short message
+              describing the program and how to opt out.
+            </p>
+
+            <h3>Sample message</h3>
+            <div class="sample-msg">
+              <span>From California Talks</span>
+              California Talks: Your opinion matters. Take our 3-min district survey:
+              https://catalks.org/s/abc Reply STOP to opt out, HELP for help. Msg&amp;data rates may apply.
+            </div>
+
+            <h3>Privacy</h3>
+            <p>
+              California Talks does not sell, rent, or share your phone number or personal information with
+              third parties for their marketing purposes. Phone numbers collected through this opt-in form
+              are used only to deliver the survey invitations you have consented to receive. We retain your
+              number only for the duration of your participation, and we delete it on request. To request
+              deletion, email <a href="mailto:ali@catalks.org">ali@catalks.org</a> from the email address
+              on file, or reply STOP to any survey invitation.
+            </p>
+
+            <h3>Terms</h3>
+            <p>
+              This SMS program is operated by California Talks for non-commercial public-opinion research.
+              You must be the subscriber of the mobile number you enter, or be authorized to opt in on its
+              behalf. California Talks may end or modify the program at any time without notice. Carriers
+              are not liable for delayed or undelivered messages.
+            </p>
+          </div>
+
+          <form class="consent-form" action="https://formsubmit.co/ajax/ali@catalks.org" method="POST">
+            <h2 style="margin:0">Opt in to text-message surveys</h2>
+            <input type="hidden" name="_subject" value="New SMS opt-in from California Talks website" />
+            <input type="hidden" name="_template" value="table" />
+            <input type="hidden" name="opt_in_source" value="catalks.org/sms-consent.html" />
+
+            <label>
+              Full name
+              <input type="text" name="name" autocomplete="name" required />
+            </label>
+            <label>
+              Mobile phone number
+              <input
+                type="tel"
+                name="phone"
+                autocomplete="tel"
+                placeholder="(555) 555-5555"
+                pattern="[\d\s\-\(\)\+]{10,20}"
+                required
+              />
+            </label>
+            <label>
+              Email (optional)
+              <input type="email" name="email" autocomplete="email" />
+            </label>
+            <label>
+              ZIP code (optional)
+              <input type="text" name="zip" autocomplete="postal-code" inputmode="numeric" maxlength="10" />
+            </label>
+
+            <label class="consent-check">
+              <input type="checkbox" name="sms_consent" value="yes" required />
+              <span>
+                I agree to receive SMS survey invitations from California Talks at the phone number above.
+                Message frequency varies (typically 0&ndash;2 per month). Message and data rates may apply.
+                Reply STOP to cancel or HELP for help. Consent is not a condition of any purchase.
+              </span>
+            </label>
+
+            <p class="fine-print">
+              By submitting this form you confirm that the phone number provided is yours and that you have
+              read and agree to the privacy and terms sections shown on this page.
+            </p>
+
+            <button type="submit">Opt in to SMS surveys</button>
+            <p class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="disclosure" style="margin-top:32px; max-width:920px;">
+          <strong>For survey recipients on our voter-file outreach:</strong>
+          California Talks also sends a limited number of opinion-research SMS invitations to phone numbers
+          obtained from publicly available voter registration files for the sole purpose of conducting
+          non-commercial public-opinion research. These messages are not marketing or advertising. Every
+          such message includes clear identification of California Talks and STOP/HELP instructions, and any
+          recipient who replies STOP is immediately and permanently removed from our SMS contact list.
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <strong>California Talks</strong>
+      <span>Public Opinion Research</span>
+      <a href="mailto:ali@catalks.org">ali@catalks.org</a>
+      <a href="/sms-consent.html">SMS Consent</a>
+    </footer>
+
+    <script>
+      (function () {
+        var form = document.querySelector('.consent-form');
+        if (!form) return;
+        var status = form.querySelector('.form-status');
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          status.classList.remove('error');
+          status.textContent = 'Submitting...';
+          var data = new FormData(form);
+          fetch(form.action, {
+            method: 'POST',
+            headers: { Accept: 'application/json' },
+            body: data,
+          })
+            .then(function (response) {
+              if (!response.ok) throw new Error('Network error');
+              return response.json();
+            })
+            .then(function () {
+              form.reset();
+              status.textContent =
+                "Thanks — you're opted in. Watch your texts for the next California Talks survey invitation.";
+            })
+            .catch(function () {
+              status.classList.add('error');
+              status.textContent =
+                'Something went wrong. Please email ali@catalks.org to opt in instead.';
+            });
+        });
+      })();
+    </script>
+  </body>
+</html>
