@@ -91,7 +91,7 @@ contactForm?.addEventListener("submit", async (event) => {
     formStatus.textContent = "Thank you. Your inquiry has been sent.";
   } catch {
     formStatus.classList.add("error");
-    formStatus.textContent = "There was an issue sending the form. Please email ali@catalks.org.";
+    formStatus.textContent = "There was an issue sending the form. Please email ali@californiatalks.org.";
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalLabel;

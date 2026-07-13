@@ -37,5 +37,5 @@ californiatalks/
 ## Contact
 
 California Talks  
-ali@catalks.org  
+ali@californiatalks.org
 [californiatalks.org](https://www.californiatalks.org)
