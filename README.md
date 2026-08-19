@@ -17,6 +17,8 @@ Visit: [www.californiatalks.org](https://www.californiatalks.org)
 Cloudflare's Git integration deploys the `public/` directory to the
 `californiatalks` Worker. A merge or push to `main` triggers the production
 deployment for `californiatalks.org` and `www.californiatalks.org`.
+`wrangler.jsonc` defines the Worker name, compatibility date, and static-assets
+directory used by both production and pull-request preview builds.
 
 The checked-in `render.yaml` is a legacy configuration and is not the current
 production hosting path.
@@ -34,12 +36,13 @@ Then open: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ```text
 californiatalks/
 ├── app.py              # Dependency-free local preview server
-├── public/             # Static website published by Render
+├── public/             # Static assets published by the Cloudflare Worker
 │   ├── index.html
 │   ├── styles.css
 │   ├── script.js
 │   └── assets/
 ├── render.yaml         # Legacy inactive Render configuration
+├── wrangler.jsonc      # Active Cloudflare Worker deployment configuration
 └── README.md
 ```
 
