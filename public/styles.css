@@ -84,6 +84,14 @@ a {
   color: var(--blue);
 }
 
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: max-content;
+}
+
+.nav-portal,
 .nav-cta,
 .button,
 .contact-form button {
@@ -102,6 +110,12 @@ a {
     background 180ms ease;
 }
 
+.nav-portal {
+  color: var(--blue-deep);
+  background: transparent;
+  border: 1px solid rgba(15, 47, 69, 0.48);
+}
+
 .nav-cta,
 .button.primary,
 .contact-form button {
@@ -116,6 +130,7 @@ a {
 }
 
 .nav-cta:hover,
+.nav-portal:hover,
 .button:hover,
 .contact-form button:hover {
   transform: translateY(-2px);
@@ -719,6 +734,16 @@ a {
     min-height: 40px;
     padding-inline: 12px;
     font-size: 0.9rem;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .nav-portal {
+    min-height: 40px;
+    padding-inline: 10px;
+    font-size: 0.84rem;
   }
 
   .hero h1 {
