@@ -139,7 +139,6 @@ a {
 
 .hero {
   position: relative;
-  min-height: calc(100vh - 72px);
   display: flex;
   align-items: center;
   overflow: hidden;
@@ -273,7 +272,7 @@ a {
   z-index: 1;
   width: 100%;
   max-width: 1120px;
-  padding: 8vh clamp(20px, 6vw, 72px);
+  padding: clamp(56px, 7vh, 76px) clamp(20px, 6vw, 72px);
 }
 
 .eyebrow,
@@ -689,10 +688,6 @@ a {
 
   .main-nav {
     display: none;
-  }
-
-  .hero {
-    min-height: 760px;
   }
 
   .stream {
