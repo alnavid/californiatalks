@@ -94,7 +94,8 @@ a {
 .nav-portal,
 .nav-cta,
 .button,
-.contact-form button {
+.contact-form button,
+.newsletter-form button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -118,7 +119,8 @@ a {
 
 .nav-cta,
 .button.primary,
-.contact-form button {
+.contact-form button,
+.newsletter-form button {
   background: var(--gold);
   color: var(--blue-deep);
 }
@@ -132,7 +134,8 @@ a {
 .nav-cta:hover,
 .nav-portal:hover,
 .button:hover,
-.contact-form button:hover {
+.contact-form button:hover,
+.newsletter-form button:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 28px rgba(22, 32, 42, 0.18);
 }
@@ -353,7 +356,8 @@ a {
 .data-band,
 .explorer,
 .proof,
-.contact {
+.contact,
+.newsletter {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
   gap: clamp(28px, 6vw, 72px);
@@ -435,7 +439,8 @@ a {
 .service-card p,
 .data-band p,
 .explorer-copy p,
-.contact p {
+.contact p,
+.newsletter > div > p {
   color: var(--muted);
   font-size: 1.04rem;
 }
@@ -566,7 +571,8 @@ a {
   color: rgba(255, 255, 255, 0.86);
 }
 
-.contact-form {
+.contact-form,
+.newsletter-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
@@ -577,7 +583,8 @@ a {
   box-shadow: var(--shadow);
 }
 
-.contact-form label {
+.contact-form label,
+.newsletter-form label {
   display: grid;
   gap: 7px;
   color: var(--blue-deep);
@@ -586,13 +593,17 @@ a {
 
 .contact-form .wide,
 .contact-form button,
+.newsletter-form button,
+.newsletter-form .cf-turnstile,
+.newsletter-form .form-fineprint,
 .form-status {
   grid-column: 1 / -1;
 }
 
 .contact-form input,
 .contact-form select,
-.contact-form textarea {
+.contact-form textarea,
+.newsletter-form input {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -604,7 +615,8 @@ a {
 
 .contact-form input:focus,
 .contact-form select:focus,
-.contact-form textarea:focus {
+.contact-form textarea:focus,
+.newsletter-form input:focus {
   outline: 3px solid rgba(240, 194, 58, 0.36);
   border-color: var(--gold);
 }
@@ -620,6 +632,45 @@ a {
   color: var(--red);
 }
 
+.newsletter {
+  background: var(--white);
+  border-block: 1px solid var(--line);
+}
+
+.newsletter-form .optional {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.newsletter-form .honeypot {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.newsletter-form button:disabled,
+.contact-form button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
+}
+
+.form-fineprint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.form-fineprint a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .site-footer {
   display: flex;
   flex-wrap: wrap;
@@ -632,6 +683,42 @@ a {
 
 .site-footer strong {
   color: var(--white);
+}
+
+.confirmation-page {
+  min-height: calc(100vh - 96px);
+  display: grid;
+  place-items: center;
+  padding: clamp(36px, 8vw, 96px) 20px;
+  background:
+    radial-gradient(circle at 80% 10%, rgba(240, 194, 58, 0.16), transparent 28%),
+    var(--paper);
+}
+
+.confirmation-card {
+  width: min(680px, 100%);
+  padding: clamp(28px, 6vw, 56px);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 8px solid var(--gold);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.confirmation-card h1 {
+  margin: 8px 0 14px;
+  color: var(--blue-deep);
+  font-size: clamp(2rem, 6vw, 4rem);
+  line-height: 1.05;
+}
+
+.confirmation-card p {
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.confirmation-card form {
+  margin-top: 24px;
 }
 
 @keyframes grid-drift {
@@ -704,7 +791,8 @@ a {
   .data-band,
   .explorer,
   .proof,
-  .contact {
+  .contact,
+  .newsletter {
     grid-template-columns: 1fr;
   }
 
@@ -752,7 +840,8 @@ a {
     gap: 7px;
   }
 
-  .contact-form {
+  .contact-form,
+  .newsletter-form {
     grid-template-columns: 1fr;
   }
 }

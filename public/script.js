@@ -65,7 +65,7 @@ if (window.lucide) {
 }
 
 const contactForm = document.querySelector(".contact-form");
-const formStatus = document.querySelector(".form-status");
+const formStatus = contactForm?.querySelector(".form-status");
 
 contactForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -92,6 +92,45 @@ contactForm?.addEventListener("submit", async (event) => {
   } catch {
     formStatus.classList.add("error");
     formStatus.textContent = "There was an issue sending the form. Please email ali@californiatalks.org.";
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = originalLabel;
+  }
+});
+
+const newsletterForm = document.querySelector(".newsletter-form");
+const newsletterStatus = newsletterForm?.querySelector(".newsletter-status");
+
+newsletterForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!newsletterStatus) return;
+
+  const submitButton = newsletterForm.querySelector("button");
+  const originalLabel = submitButton.textContent;
+  submitButton.disabled = true;
+  submitButton.textContent = "Subscribing...";
+  newsletterStatus.classList.remove("error");
+  newsletterStatus.textContent = "";
+
+  try {
+    const response = await fetch(newsletterForm.action, {
+      method: "POST",
+      body: new FormData(newsletterForm),
+      headers: { Accept: "application/json" },
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.error || "Subscription failed");
+
+    newsletterForm.reset();
+    window.turnstile?.reset();
+    newsletterStatus.textContent =
+      "Almost done—check your inbox for a confirmation email from ali@californiatalks.org.";
+  } catch (error) {
+    newsletterStatus.classList.add("error");
+    newsletterStatus.textContent = error instanceof Error
+      ? error.message
+      : "We could not process your request. Please try again.";
+    window.turnstile?.reset();
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalLabel;

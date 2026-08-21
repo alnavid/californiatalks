@@ -1,0 +1,8 @@
+{
+  "name": "californiatalks-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/newsletter-worker.test.js"
+  }
+}
