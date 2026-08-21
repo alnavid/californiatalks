@@ -2,6 +2,11 @@
 *.py[cod]
 .streamlit/
 .env
+.dev.vars
+node_modules/
+.wrangler/
+# Superseded local planning notes contain account-specific SendGrid details.
+NEWSLETTER_SENDGRID_PLAN.md
 venv/
 .venv/
 *.log

@@ -11,6 +11,20 @@ Visit: [www.californiatalks.org](https://www.californiatalks.org)
 - Static HTML, CSS, and JavaScript
 - Formsubmit.co for inquiry form delivery
 - Cloudflare Worker with Static Assets
+- Cloudflare Turnstile and KV for newsletter double opt-in
+- Brevo API for confirmation email, subscriber management, and campaigns
+
+## Newsletter
+
+The homepage newsletter form posts to `POST /api/subscribe` in the Cloudflare
+Worker. After Turnstile verification, the Worker sends a confirmation message
+through Brevo and stores an opaque, seven-day confirmation token in Cloudflare
+KV. `POST /api/confirm` consumes that token and adds the confirmed address to
+the Brevo newsletter list with consent metadata.
+
+API credentials are Cloudflare Worker secrets and are never stored in this
+repository. See [NEWSLETTER_IMPLEMENTATION.md](NEWSLETTER_IMPLEMENTATION.md)
+for the architecture, rollout record, and operating notes.
 
 ## Production Deployment
 
@@ -36,14 +50,24 @@ Then open: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 ```text
 californiatalks/
 ├── app.py              # Dependency-free local preview server
+├── newsletter/         # Reusable California Talks newsletter HTML and test-send utility
 ├── public/             # Static assets published by the Cloudflare Worker
 │   ├── index.html
 │   ├── styles.css
 │   ├── script.js
 │   └── assets/
+├── src/index.js        # Worker API for subscription and confirmation
+├── test/               # Worker and navigation regression tests
 ├── render.yaml         # Legacy inactive Render configuration
 ├── wrangler.jsonc      # Active Cloudflare Worker deployment configuration
 └── README.md
+```
+
+## Verification
+
+```bash
+npm test
+npx wrangler deploy --dry-run
 ```
 
 ## Contact

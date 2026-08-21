@@ -10,7 +10,7 @@
     />
     <link rel="icon" href="/favicon.ico?v=20260501d" sizes="any" />
     <link rel="icon" href="/assets/catalks_bear_favicon.png?v=20260501d" type="image/png" />
-    <link rel="stylesheet" href="/styles.css?v=20260818a" />
+    <link rel="stylesheet" href="/styles.css?v=20260820a" />
   </head>
   <body>
     <header class="site-header">
@@ -18,10 +18,12 @@
         <img src="/assets/catalks_bear_logo.png?v=20260501d" alt="" />
         <span>California Talks</span>
       </a>
+      <!-- Standard site navigation -->
       <nav class="main-nav" aria-label="Primary navigation">
-        <a href="#services">Services</a>
-        <a href="#proof">Proof</a>
-        <a href="#contact">Contact</a>
+        <a href="/#services">Services</a>
+        <a href="/#proof">Proof</a>
+        <a href="/#newsletter">Newsletter</a>
+        <a href="/#contact">Contact</a>
         <a href="/sms-consent.html">SMS Consent</a>
         <a href="/privacy.html">Privacy</a>
       </nav>
@@ -177,6 +179,43 @@
         </div>
       </section>
 
+      <section class="section newsletter" id="newsletter" aria-labelledby="newsletter-title">
+        <div>
+          <p class="section-kicker">Newsletter</p>
+          <h2 id="newsletter-title">California, in numbers—a few times a month.</h2>
+          <p>
+            Fresh polling, ballot-measure snapshots, and what the data says about where California stands.
+            No spam. Unsubscribe anytime.
+          </p>
+        </div>
+        <form class="newsletter-form" action="/api/subscribe" method="POST" novalidate>
+          <label>
+            Email address
+            <input type="email" name="email" autocomplete="email" required />
+          </label>
+          <label>
+            First name <span class="optional">Optional</span>
+            <input type="text" name="first_name" autocomplete="given-name" maxlength="80" />
+          </label>
+          <label class="honeypot" aria-hidden="true">
+            Website
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
+          <div
+            class="cf-turnstile"
+            data-sitekey="0x4AAAAAAEXDtsw6gmXaDSBv"
+            data-action="newsletter-signup"
+            data-size="flexible"
+          ></div>
+          <button type="submit">Subscribe</button>
+          <p class="newsletter-status form-status" role="status" aria-live="polite"></p>
+          <p class="form-fineprint">
+            By subscribing, you agree to receive email from California Talks. We never sell or share your
+            address for third-party marketing. Unsubscribe anytime. <a href="/privacy.html">Privacy Policy</a>
+          </p>
+        </form>
+      </section>
+
       <section class="section contact" id="contact">
         <div>
           <p class="section-kicker">Project intake</p>
@@ -225,11 +264,13 @@
       <strong>California Talks</strong>
       <span>Public Opinion Research</span>
       <a href="mailto:ali@californiatalks.org">ali@californiatalks.org</a>
+      <a href="/#newsletter">Newsletter</a>
       <a href="/sms-consent.html">SMS Consent</a>
       <a href="/privacy.html">Privacy Policy</a>
     </footer>
 
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-    <script src="/script.js?v=20260501d"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="/script.js?v=20260820a"></script>
   </body>
 </html>
