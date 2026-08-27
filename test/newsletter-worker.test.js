@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
 
-import worker, { cleanName, normalizeEmail, randomToken } from "../src/index.js";
+import worker, { cleanName, normalizeEmail, normalizePhone, randomToken } from "../src/index.js";
 
 const STANDARD_NAVIGATION = [
   ["/#services", "Services"],
@@ -42,9 +42,10 @@ function environment(kv = new MemoryKv()) {
     TURNSTILE_ACTION: "newsletter-signup",
     ALLOWED_ORIGINS: "https://www.californiatalks.org,https://californiatalks.org",
     SITE_URL: "https://www.californiatalks.org",
-    FROM_EMAIL: "ali@californiatalks.org",
+    CONTACT_TO_EMAIL: "recipient@example.com",
+    BREVO_SENDER_EMAIL: "sender@example.com",
     FROM_NAME: "California Talks",
-    PRIVACY_VERSION: "2026-08-20",
+    PRIVACY_VERSION: "2026-08-26",
   };
 }
 
@@ -64,6 +65,8 @@ test("normalizes email and cleans names", () => {
   assert.equal(normalizeEmail("  Person@Example.COM "), "person@example.com");
   assert.equal(normalizeEmail("not-an-email"), "");
   assert.equal(cleanName("  Ali\n  Navid  "), "Ali Navid");
+  assert.equal(normalizePhone("(714) 555-0123"), "(714) 555-0123");
+  assert.equal(normalizePhone("123"), "");
   assert.match(randomToken(), /^[A-Za-z0-9_-]{43}$/u);
 });
 
@@ -79,6 +82,92 @@ test("every public HTML page uses the standard primary navigation", () => {
     const links = [...navigation[1].matchAll(/<a href="([^"]+)">([^<]+)<\/a>/gu)]
       .map((match) => [match[1], match[2]]);
     assert.deepEqual(links, STANDARD_NAVIGATION, `${name} has nonstandard primary navigation`);
+  }
+});
+
+test("public assets do not expose direct email links and forms use Worker endpoints", () => {
+  const publicDirectory = new URL("../public/", import.meta.url);
+  const publicFiles = fs.readdirSync(publicDirectory)
+    .filter((name) => name.endsWith(".html") || name.endsWith(".js"));
+  const source = publicFiles
+    .map((name) => fs.readFileSync(new URL(name, publicDirectory), "utf8"))
+    .join("\n");
+
+  assert.doesNotMatch(source, /mailto:/iu);
+
+  const homepage = fs.readFileSync(new URL("index.html", publicDirectory), "utf8");
+  const smsConsent = fs.readFileSync(new URL("sms-consent.html", publicDirectory), "utf8");
+  assert.match(homepage, /class="contact-form" action="\/api\/contact"/u);
+  assert.match(smsConsent, /class="consent-form" action="\/api\/sms-opt-in"/u);
+});
+
+test("contact form validates and delivers through the private Worker route", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url: String(url), options });
+    return new Response(null, { status: 201 });
+  };
+
+  try {
+    const response = await worker.fetch(
+      formRequest("/api/contact", {
+        name: "Person",
+        email: "person@example.com",
+        project_type: "Likely voter poll",
+        geography: "Orange County",
+        message: "We need a benchmark survey.",
+      }),
+      environment(),
+    );
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+
+    const payload = JSON.parse(calls[0].options.body);
+    assert.equal(payload.to[0].email, "recipient@example.com");
+    assert.equal(payload.replyTo.email, "person@example.com");
+    assert.match(payload.textContent, /Orange County/u);
+    assert.deepEqual(payload.tags, ["website-contact"]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("SMS opt-in validates consent and delivers through the private Worker route", async () => {
+  const originalFetch = globalThis.fetch;
+  const calls = [];
+  globalThis.fetch = async (url, options) => {
+    calls.push({ url: String(url), options });
+    return new Response(null, { status: 201 });
+  };
+
+  try {
+    const rejected = await worker.fetch(
+      formRequest("/api/sms-opt-in", { name: "Person", phone: "(714) 555-0123" }),
+      environment(),
+    );
+    assert.equal(rejected.status, 400);
+
+    const response = await worker.fetch(
+      formRequest("/api/sms-opt-in", {
+        name: "Person",
+        phone: "(714) 555-0123",
+        email: "person@example.com",
+        zip: "92821",
+        sms_consent: "yes",
+        opt_in_source: "californiatalks.org/sms-consent.html",
+      }),
+      environment(),
+    );
+    assert.equal(response.status, 200);
+    assert.deepEqual(await response.json(), { ok: true });
+
+    const payload = JSON.parse(calls[0].options.body);
+    assert.equal(payload.to[0].email, "recipient@example.com");
+    assert.match(payload.textContent, /SMS consent: yes/u);
+    assert.deepEqual(payload.tags, ["website-sms-opt-in"]);
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 });
 
@@ -129,7 +218,7 @@ test("subscribe stores an opaque pending token and sends confirmation without by
 
     const mailCall = calls.find((call) => call.url.endsWith("/smtp/email"));
     const payload = JSON.parse(mailCall.options.body);
-    assert.equal(payload.sender.email, "ali@californiatalks.org");
+    assert.equal(payload.sender.email, "sender@example.com");
     assert.match(payload.textContent, /Confirm your subscription/u);
     assert.match(payload.htmlContent, /Confirm subscription/u);
     assert.deepEqual(payload.tags, ["newsletter-confirm"]);

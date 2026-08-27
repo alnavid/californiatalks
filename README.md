@@ -9,10 +9,9 @@ Visit: [www.californiatalks.org](https://www.californiatalks.org)
 ## Tech Stack
 
 - Static HTML, CSS, and JavaScript
-- Formsubmit.co for inquiry form delivery
 - Cloudflare Worker with Static Assets
 - Cloudflare Turnstile and KV for newsletter double opt-in
-- Brevo API for confirmation email, subscriber management, and campaigns
+- Brevo API for private form delivery, confirmation email, subscriber management, and campaigns
 
 ## Newsletter
 
@@ -72,6 +71,4 @@ npx wrangler deploy --dry-run
 
 ## Contact
 
-California Talks  
-ali@californiatalks.org
-[californiatalks.org](https://www.californiatalks.org)
+Use the project-intake form at [californiatalks.org](https://www.californiatalks.org/#contact).

@@ -3,6 +3,7 @@ const TURNSTILE_VERIFY = "https://challenges.cloudflare.com/turnstile/v0/sitever
 const PENDING_TTL_SECONDS = 7 * 24 * 60 * 60;
 const EMAIL_COOLDOWN_SECONDS = 5 * 60;
 const IP_COOLDOWN_SECONDS = 10;
+const FORM_COOLDOWN_SECONDS = 60;
 const KV_MINIMUM_TTL_SECONDS = 60;
 const MAX_BODY_BYTES = 16 * 1024;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/u;
@@ -24,10 +25,16 @@ export default {
         return json({ error: "Method not allowed" }, 405);
       }
 
+      if (url.pathname === "/api/contact" || url.pathname === "/api/sms-opt-in") {
+        if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
+        const formType = url.pathname === "/api/contact" ? "contact" : "sms-opt-in";
+        return await submitSiteForm(request, env, formType);
+      }
+
       if (url.pathname.startsWith("/api/")) return json({ error: "Not found" }, 404);
       return env.ASSETS.fetch(request);
     } catch (error) {
-      console.error("newsletter_request_failed", error instanceof Error ? error.message : error);
+      console.error("worker_request_failed", error instanceof Error ? error.message : error);
       if (url.pathname === "/api/confirm") {
         const token = url.searchParams.get("token") || "";
         return confirmRedirect(env, token, true);
@@ -96,6 +103,86 @@ async function subscribe(request, env) {
   return subscriptionAccepted();
 }
 
+async function submitSiteForm(request, env, formType) {
+  requireFormConfiguration(env);
+  if (!isAllowedOrigin(request, env)) return json({ error: "Forbidden" }, 403);
+  enforceBodyLimit(request);
+
+  const body = await readBody(request);
+  if (body.website) return formAccepted();
+
+  const ipHash = await sha256(request.headers.get("CF-Connecting-IP") || "unknown");
+  const rateKey = `rate:form:${formType}:${ipHash}`;
+  if (await env.NEWSLETTER_PENDING.get(rateKey)) {
+    return json({ error: "Please wait a moment and try again." }, 429);
+  }
+
+  const name = cleanName(body.name);
+  const email = normalizeEmail(body.email);
+  if (!name) return json({ error: "Please enter your name." }, 400);
+
+  let subject;
+  let textContent;
+  let tag;
+
+  if (formType === "contact") {
+    const projectType = cleanText(body.project_type, 120);
+    const geography = cleanText(body.geography, 200);
+    const message = cleanText(body.message, 5_000);
+    if (!email) return json({ error: "Please enter a valid email address." }, 400);
+    if (!projectType || !message) return json({ error: "Please complete the required fields." }, 400);
+
+    subject = "New inquiry from the California Talks website";
+    tag = "website-contact";
+    textContent = [
+      `Submitted: ${new Date().toISOString()}`,
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Project type: ${projectType}`,
+      `Geography: ${geography || "Not provided"}`,
+      "",
+      "Inquiry:",
+      message,
+    ].join("\n");
+  } else {
+    const phone = normalizePhone(body.phone);
+    const zip = cleanText(body.zip, 12);
+    const source = cleanText(body.opt_in_source, 160);
+    if (!phone) return json({ error: "Please enter a valid mobile phone number." }, 400);
+    if (body.email && !email) return json({ error: "Please enter a valid email address." }, 400);
+    if (body.sms_consent !== "yes") return json({ error: "Consent is required to opt in." }, 400);
+
+    subject = "New SMS opt-in from the California Talks website";
+    tag = "website-sms-opt-in";
+    textContent = [
+      `Submitted: ${new Date().toISOString()}`,
+      `Name: ${name}`,
+      `Mobile phone: ${phone}`,
+      `Email: ${email || "Not provided"}`,
+      `ZIP code: ${zip || "Not provided"}`,
+      `Source: ${source || "Website SMS consent page"}`,
+      "SMS consent: yes",
+    ].join("\n");
+  }
+
+  await env.NEWSLETTER_PENDING.put(rateKey, "1", { expirationTtl: FORM_COOLDOWN_SECONDS });
+
+  await brevoRequest("/smtp/email", env, {
+    method: "POST",
+    body: {
+      sender: { email: env.BREVO_SENDER_EMAIL, name: env.FROM_NAME },
+      to: [{ email: env.CONTACT_TO_EMAIL, name: env.FROM_NAME }],
+      ...(email ? { replyTo: { email, name } } : {}),
+      subject,
+      textContent,
+      tags: [tag],
+    },
+    acceptedStatuses: [201],
+  });
+
+  return formAccepted();
+}
+
 function confirmationLanding(url, env) {
   const token = url.searchParams.get("token") || "";
   if (!TOKEN_RE.test(token)) return expiredRedirect(env);
@@ -151,9 +238,9 @@ async function sendConfirmation(email, firstName, token, env) {
   await brevoRequest("/smtp/email", env, {
     method: "POST",
     body: {
-      sender: { email: env.FROM_EMAIL, name: env.FROM_NAME },
+      sender: { email: env.BREVO_SENDER_EMAIL, name: env.FROM_NAME },
       to: [{ email, ...(firstName ? { name: firstName } : {}) }],
-      replyTo: { email: env.FROM_EMAIL, name: env.FROM_NAME },
+      replyTo: { email: env.BREVO_SENDER_EMAIL, name: env.FROM_NAME },
       subject: "Confirm your California Talks newsletter subscription",
       textContent: `${greetingText}\n\nConfirm your subscription to the California Talks newsletter:\n${link}\n\nIf you did not request this, ignore this email and you will not be subscribed.\n\n${addressText}`,
       htmlContent: `<p>${greetingHtml}</p><p>Please confirm your subscription to the California Talks newsletter:</p><p><a href="${link}" style="display:inline-block;padding:12px 20px;background:#164b73;color:#fff;border-radius:6px;text-decoration:none;font-weight:700">Confirm subscription</a></p><p style="color:#5e6975">If you did not request this, ignore this email and you will not be subscribed.</p><p style="color:#5e6975">California Talks LLC &middot; 2500 E. Imperial Hwy, Ste 149A-268 &middot; Brea, CA 92821</p>`,
@@ -247,9 +334,22 @@ function requireConfiguration(env) {
     "TURNSTILE_HOSTNAMES",
     "TURNSTILE_ACTION",
     "SITE_URL",
-    "FROM_EMAIL",
+    "BREVO_SENDER_EMAIL",
     "FROM_NAME",
     "PRIVACY_VERSION",
+  ];
+  const missing = required.filter((name) => !env[name]);
+  if (missing.length) throw new Error(`Missing Worker configuration: ${missing.join(",")}`);
+}
+
+function requireFormConfiguration(env) {
+  const required = [
+    "NEWSLETTER_PENDING",
+    "BREVO_API_KEY",
+    "CONTACT_TO_EMAIL",
+    "BREVO_SENDER_EMAIL",
+    "FROM_NAME",
+    "ALLOWED_ORIGINS",
   ];
   const missing = required.filter((name) => !env[name]);
   if (missing.length) throw new Error(`Missing Worker configuration: ${missing.join(",")}`);
@@ -285,6 +385,20 @@ function cleanName(value) {
     .replace(/\s+/gu, " ")
     .trim()
     .slice(0, 80);
+}
+
+function cleanText(value, maximumLength) {
+  return String(value || "")
+    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/gu, " ")
+    .trim()
+    .slice(0, maximumLength);
+}
+
+function normalizePhone(value) {
+  const phone = cleanText(value, 24);
+  const digits = phone.replace(/\D/gu, "");
+  if (digits.length < 10 || digits.length > 15 || !/^[\d\s()+.-]+$/u.test(phone)) return "";
+  return phone;
 }
 
 function randomToken() {
@@ -328,6 +442,10 @@ function subscriptionAccepted() {
   return json({ ok: true, mode: "confirm" });
 }
 
+function formAccepted() {
+  return json({ ok: true });
+}
+
 function expiredRedirect(env) {
   return Response.redirect(`${env.SITE_URL}/newsletter-link-expired.html`, 303);
 }
@@ -348,4 +466,4 @@ function json(body, status = 200) {
   });
 }
 
-export { cleanName, normalizeEmail, randomToken, sha256 };
+export { cleanName, normalizeEmail, normalizePhone, randomToken, sha256 };
