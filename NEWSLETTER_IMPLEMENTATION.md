@@ -38,7 +38,7 @@ other credentials. Production secrets live only in Cloudflare.
    record contains the normalized email, optional first name, request time,
    and privacy-policy version.
 4. The Worker calls Brevo `POST /v3/smtp/email` to send the confirmation email
-   from `California Talks <ali@californiatalks.org>`.
+   from the configured California Talks sender.
 5. The confirmation link opens a landing page; the visitor completes
    `POST /api/confirm` rather than being subscribed by an email-scanner GET.
 6. The Worker consumes the one-time KV token and calls Brevo
@@ -59,7 +59,7 @@ The stored Brevo attributes are:
 ## Brevo configuration verified during rollout
 
 - Plan: Starter, 5,000 email credits at verification time.
-- Sender: `California Talks <ali@californiatalks.org>`.
+- Sender: the configured California Talks sender identity.
 - List: `California Talks Newsletter`.
 - Sending domain: `californiatalks.org`.
 - Authentication: ownership verification, both Brevo DKIM records, and DMARC
@@ -75,12 +75,15 @@ infrastructure. A dedicated IP is neither required nor desirable.
 
 The Worker is named `californiatalks` and serves the static files in `public/`.
 Worker execution is forced for `/api/*`. Configuration in `wrangler.jsonc`
-includes the public origin/hostname allowlists, sender identity, Brevo list ID,
-privacy version, and the `NEWSLETTER_PENDING` KV binding.
+includes the public origin/hostname allowlists, sender name, Brevo list ID,
+privacy version, and the `NEWSLETTER_PENDING` KV binding. Sender and form-routing
+email addresses are stored as Worker secrets so they are not exposed in source.
 
-The only required production secrets are:
+The required production secrets are:
 
 - `BREVO_API_KEY`
+- `CONTACT_TO_EMAIL`
+- `BREVO_SENDER_EMAIL`
 - `TURNSTILE_SECRET_KEY`
 
 The API key is never returned to the browser. The old `SENDGRID_API_KEY`
@@ -141,6 +144,7 @@ exactly the intended internal recipient:
 
 ```powershell
 $env:BREVO_API_KEY = "<read from the approved secret source>"
+$env:BREVO_SENDER_EMAIL = "<read from the approved sender configuration>"
 node newsletter/send-brevo-test.mjs "recipient@example.com"
 ```
 

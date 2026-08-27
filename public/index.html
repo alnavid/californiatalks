@@ -225,9 +225,8 @@
             shape the right polling, message test, focus group, or community research plan.
           </p>
         </div>
-        <form class="contact-form" action="https://formsubmit.co/ajax/ali@californiatalks.org" method="POST">
-          <input type="hidden" name="_subject" value="New Inquiry from California Talks website" />
-          <input type="hidden" name="_template" value="table" />
+        <form class="contact-form" action="/api/contact" method="POST">
+          <input type="text" name="website" class="form-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true" />
           <label>
             Name
             <input type="text" name="name" autocomplete="name" required />
@@ -263,7 +262,6 @@
     <footer class="site-footer">
       <strong>California Talks</strong>
       <span>Public Opinion Research</span>
-      <a href="mailto:ali@californiatalks.org">ali@californiatalks.org</a>
       <a href="/#newsletter">Newsletter</a>
       <a href="/sms-consent.html">SMS Consent</a>
       <a href="/privacy.html">Privacy Policy</a>

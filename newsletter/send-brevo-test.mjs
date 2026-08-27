@@ -3,10 +3,13 @@ import fs from "node:fs";
 const BREVO_API = "https://api.brevo.com/v3";
 const LIST_ID = 2;
 const apiKey = process.env.BREVO_API_KEY;
+const senderEmail = process.env.BREVO_SENDER_EMAIL;
+const replyToEmail = process.env.BREVO_REPLY_TO_EMAIL || senderEmail;
 const recipient = process.argv[2];
 const campaignName = "California Affordability Snapshot - Brevo Test - 2026-08-20";
 
 if (!apiKey) throw new Error("BREVO_API_KEY is required");
+if (!senderEmail) throw new Error("BREVO_SENDER_EMAIL is required");
 if (!recipient) throw new Error("Pass the single expected recipient as the first argument");
 
 async function brevo(path, options = {}) {
@@ -43,10 +46,10 @@ if (!campaign) {
   const created = await brevo("/emailCampaigns", {
     method: "POST",
     body: JSON.stringify({
-      sender: { name: "California Talks", email: "ali@californiatalks.org" },
+      sender: { name: "California Talks", email: senderEmail },
       name: campaignName,
       subject: "TEST - California Affordability Snapshot",
-      replyTo: "ali@californiatalks.org",
+      replyTo: replyToEmail,
       htmlContent,
       recipients: { listIds: [LIST_ID] },
       inlineImageActivation: false,

@@ -91,7 +91,7 @@ contactForm?.addEventListener("submit", async (event) => {
     formStatus.textContent = "Thank you. Your inquiry has been sent.";
   } catch {
     formStatus.classList.add("error");
-    formStatus.textContent = "There was an issue sending the form. Please email ali@californiatalks.org.";
+    formStatus.textContent = "There was an issue sending the form. Please try again shortly.";
   } finally {
     submitButton.disabled = false;
     submitButton.textContent = originalLabel;
@@ -124,7 +124,7 @@ newsletterForm?.addEventListener("submit", async (event) => {
     newsletterForm.reset();
     window.turnstile?.reset();
     newsletterStatus.textContent =
-      "Almost done—check your inbox for a confirmation email from ali@californiatalks.org.";
+      "Almost done—check your inbox for a confirmation email from California Talks.";
   } catch (error) {
     newsletterStatus.classList.add("error");
     newsletterStatus.textContent = error instanceof Error

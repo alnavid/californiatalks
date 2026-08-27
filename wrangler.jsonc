@@ -19,9 +19,8 @@
     "TURNSTILE_HOSTNAMES": "www.californiatalks.org,californiatalks.org",
     "TURNSTILE_ACTION": "newsletter-signup",
     "SITE_URL": "https://www.californiatalks.org",
-    "FROM_EMAIL": "ali@californiatalks.org",
     "FROM_NAME": "California Talks",
     "BREVO_LIST_ID": "2",
-    "PRIVACY_VERSION": "2026-08-20"
+    "PRIVACY_VERSION": "2026-08-26"
   }
 }
