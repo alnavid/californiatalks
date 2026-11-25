@@ -5,8 +5,9 @@ import test from "node:test";
 import worker, { cleanName, normalizeEmail, normalizePhone, randomToken } from "../src/index.js";
 
 const STANDARD_NAVIGATION = [
+  ["/about.html", "About"],
   ["/#services", "Services"],
-  ["/#proof", "Proof"],
+  ["/#case-studies", "Case Studies"],
   ["/#newsletter", "Newsletter"],
   ["/#contact", "Contact"],
   ["/sms-consent.html", "SMS Consent"],
@@ -79,7 +80,7 @@ test("every public HTML page uses the standard primary navigation", () => {
     const navigation = html.match(/<nav class="main-nav" aria-label="Primary navigation">([\s\S]*?)<\/nav>/u);
     assert.ok(navigation, `${name} is missing the primary navigation`);
 
-    const links = [...navigation[1].matchAll(/<a href="([^"]+)">([^<]+)<\/a>/gu)]
+    const links = [...navigation[1].matchAll(/<a href="([^"]+)"(?: aria-current="page")?>([^<]+)<\/a>/gu)]
       .map((match) => [match[1], match[2]]);
     assert.deepEqual(links, STANDARD_NAVIGATION, `${name} has nonstandard primary navigation`);
   }
@@ -299,4 +300,18 @@ test("confirmation accepts a missing Origin but rejects an explicit foreign Orig
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+
+test("About page and Atlas case study use approved public navigation", () => {
+  const home = fs.readFileSync(new URL("../public/index.html", import.meta.url), "utf8");
+  const about = fs.readFileSync(new URL("../public/about.html", import.meta.url), "utf8");
+  assert.match(home, /id="case-studies"/u);
+  assert.match(home, /href="https:\/\/orange-county-2026-results\.californiatalks\.org\/">Explore the public showcase/u);
+  assert.doesNotMatch(home, /Available for public display|case-study-orange-atlas\.html/u);
+  assert.match(about, /Founded in 2018 by Ali Navid/u);
+  assert.match(about, /local, state and federal levels/u);
+  assert.match(about, /40 Under 40/u);
+  assert.doesNotMatch(about, /Phillip Chen|David Ryu/u);
+  assert.ok(fs.existsSync(new URL("../public/assets/orange-atlas-overview.png", import.meta.url)));
 });
